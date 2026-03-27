@@ -1,0 +1,559 @@
+
+<style>
+  *{box-sizing:border-box}
+  .top-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .filter-btn{padding:5px 13px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary)}
+  .filter-btn.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+  .search-box{flex:1;min-width:160px;padding:6px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)}
+  .section-lbl{font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-tertiary);margin:18px 0 6px 2px}
+  .api-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:8px;overflow:hidden}
+  .api-head{display:flex;align-items:center;gap:10px;padding:12px 15px;cursor:pointer;user-select:none}
+  .api-head:hover{background:var(--color-background-secondary)}
+  .m{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;min-width:60px;text-align:center;flex-shrink:0}
+  .GET{background:var(--color-background-success);color:var(--color-text-success)}
+  .POST{background:var(--color-background-warning);color:var(--color-text-warning)}
+  .PUT{background:var(--color-background-info);color:var(--color-text-info)}
+  .DELETE{background:var(--color-background-danger);color:var(--color-text-danger)}
+  .PATCH{background:var(--color-background-warning);color:var(--color-text-warning)}
+  .ep{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--color-text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .edesc{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap;margin-left:auto;padding-left:8px}
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;flex-shrink:0}
+  .b-open{background:var(--color-background-success);color:var(--color-text-success)}
+  .b-auth{background:var(--color-background-warning);color:var(--color-text-warning)}
+  .b-admin{background:var(--color-background-danger);color:var(--color-text-danger)}
+  .api-body{display:none;border-top:0.5px solid var(--color-border-tertiary);padding:14px 15px;background:var(--color-background-secondary)}
+  .api-body.open{display:block}
+  .row{display:grid;grid-template-columns:110px 1fr;gap:6px;margin-bottom:9px;align-items:start}
+  .rl{font-size:11px;font-weight:500;color:var(--color-text-tertiary);padding-top:2px}
+  .rv{font-size:12px;color:var(--color-text-secondary)}
+  .code{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-left:3px solid var(--color-border-secondary);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:8px 11px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);white-space:pre;line-height:1.65;overflow-x:auto;margin:3px 0}
+  .ok{border-left-color:var(--color-border-success);color:var(--color-text-primary)}
+  .err{border-left-color:var(--color-border-danger)}
+  .ok-text{color:var(--color-text-success);font-size:11px;font-family:var(--font-mono)}
+  .err-text{color:var(--color-text-danger);font-size:11px;font-family:var(--font-mono)}
+  .nil{color:var(--color-text-tertiary);font-style:italic;font-size:12px}
+  .divrow{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:8px 0}
+  .hidden{display:none!important}
+  .count-badge{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--color-text-secondary)}
+</style>
+
+<div style="padding:4px 0 16px">
+<div class="top-bar">
+  <button class="filter-btn active" onclick="filterMethod('ALL',this)">All</button>
+  <button class="filter-btn" onclick="filterMethod('GET',this)">GET</button>
+  <button class="filter-btn" onclick="filterMethod('POST',this)">POST</button>
+  <button class="filter-btn" onclick="filterMethod('PUT',this)">PUT</button>
+  <button class="filter-btn" onclick="filterMethod('DELETE',this)">DELETE</button>
+  <input class="search-box" placeholder="Search endpoints..." oninput="searchApis(this.value)">
+  <span class="count-badge" id="count-lbl">13 endpoints</span>
+</div>
+
+<div class="section-lbl" data-section="auth">Auth — no token needed</div>
+
+<div class="api-card" data-method="POST" data-text="signup create account register">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m POST">POST</span>
+    <span class="ep">/api/auth/signup</span>
+    <span class="badge b-open">Public</span>
+    <span class="edesc">Create account</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-open">None required</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv">raw → JSON</span></div>
+    <div class="row"><span class="rl">JSON body</span><span class="rv"><div class="code">{
+  "username": "john",
+  "email": "john@test.com",
+  "password": "John@123"
+}</div></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{ "message": "Signup successful! Please login." }</div></span></div>
+    <div class="row"><span class="rl">400</span><span class="rv"><div class="code err">{ "message": "All fields are required." }
+{ "message": "Password must be at least 6 characters." }
+{ "message": "Email already registered." }</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="POST" data-text="login jwt token auth">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m POST">POST</span>
+    <span class="ep">/api/auth/login</span>
+    <span class="badge b-open">Public</span>
+    <span class="edesc">Login → get JWT</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-open">None required</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv">raw → JSON</span></div>
+    <div class="row"><span class="rl">User login</span><span class="rv"><div class="code">{
+  "email": "john@test.com",
+  "password": "John@123"
+}</div></span></div>
+    <div class="row"><span class="rl">Admin login</span><span class="rv"><div class="code">{
+  "email": "admin@library.com",
+  "password": "Admin@123"
+}</div></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 2,
+    "username": "john",
+    "email": "john@test.com",
+    "role": "user"
+  }
+}</div></span></div>
+    <div class="row"><span class="rl">400</span><span class="rv"><div class="code err">{ "message": "Email and password required." }</div></span></div>
+    <div class="row"><span class="rl">401</span><span class="rv"><div class="code err">{ "message": "Invalid email or password." }</div></span></div>
+  </div>
+</div>
+
+<div class="section-lbl" data-section="books">Books — Bearer token required</div>
+
+<div class="api-card" data-method="GET" data-text="get all books list catalog search filter">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/books</span>
+    <span class="badge b-auth">Token</span>
+    <span class="edesc">All books / search</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-auth">Bearer Token — any user</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <div class="row"><span class="rl">Params tab</span><span class="rv"><div class="code">search = clean          ← filter by title (optional)
+genre  = Technology     ← filter by genre  (optional)
+author = Robert         ← filter by author (optional)
+
+No params = returns all books</div></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">[
+  {
+    "id": 1,
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "genre": "Technology",
+    "quantity": 3,
+    "available": 3,
+    "addedAt": "2024-01-01T00:00:00Z"
+  },
+  { ... more books }
+]</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="GET" data-text="get single book by id one">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/books/{id}</span>
+    <span class="badge b-auth">Token</span>
+    <span class="edesc">Get one book</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-auth">Bearer Token — any user</span></span></div>
+    <div class="row"><span class="rl">URL example</span><span class="rv"><div class="code">http://localhost:5000/api/books/2</div></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{
+  "id": 2,
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "genre": "Technology",
+  "quantity": 3,
+  "available": 2,
+  "addedAt": "2024-01-01T00:00:00Z"
+}</div></span></div>
+    <div class="row"><span class="rl">404</span><span class="rv"><div class="code err">{ "message": "Book not found." }</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="POST" data-text="add create new book admin">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m POST">POST</span>
+    <span class="ep">/api/books</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">Add new book</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv">raw → JSON</span></div>
+    <div class="row"><span class="rl">JSON body</span><span class="rv"><div class="code">{
+  "title": "The Pragmatic Programmer",
+  "author": "David Thomas",
+  "genre": "Technology",
+  "quantity": 3
+}</div></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{
+  "message": "Book added successfully.",
+  "book": {
+    "id": 5,
+    "title": "The Pragmatic Programmer",
+    "author": "David Thomas",
+    "genre": "Technology",
+    "quantity": 3,
+    "available": 3
+  }
+}</div></span></div>
+    <div class="row"><span class="rl">400</span><span class="rv"><div class="code err">{ "message": "Title and Author are required." }</div></span></div>
+    <div class="row"><span class="rl">403</span><span class="rv"><div class="code err">403 Forbidden — regular user token used</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="PUT" data-text="update edit book admin put">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m PUT">PUT</span>
+    <span class="ep">/api/books/{id}</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">Update book</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">URL example</span><span class="rv"><div class="code">http://localhost:5000/api/books/2</div></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv">raw → JSON (send ALL 4 fields)</span></div>
+    <div class="row"><span class="rl">JSON body</span><span class="rv"><div class="code">{
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "genre": "Technology",
+  "quantity": 5
+}</div></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{
+  "message": "Book updated.",
+  "book": { "id": 2, "title": "Clean Code", "quantity": 5, ... }
+}</div></span></div>
+    <div class="row"><span class="rl">404</span><span class="rv"><div class="code err">{ "message": "Book not found." }</div></span></div>
+    <div class="row"><span class="rl">403</span><span class="rv"><div class="code err">403 Forbidden — regular user token used</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="DELETE" data-text="delete remove book admin">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m DELETE">DELETE</span>
+    <span class="ep">/api/books/{id}</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">Delete book</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">URL example</span><span class="rv"><div class="code">http://localhost:5000/api/books/3</div></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None — ID is in the URL</span></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{ "message": "Book deleted." }</div></span></div>
+    <div class="row"><span class="rl">404</span><span class="rv"><div class="code err">{ "message": "Book not found." }</div></span></div>
+    <div class="row"><span class="rl">403</span><span class="rv"><div class="code err">403 Forbidden — regular user token used</div></span></div>
+  </div>
+</div>
+
+<div class="section-lbl" data-section="transactions">Transactions — Bearer token required</div>
+
+<div class="api-card" data-method="GET" data-text="my books borrowed transactions history user">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/transactions/my</span>
+    <span class="badge b-auth">Token</span>
+    <span class="edesc">My borrow history</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-auth">Bearer Token — any user</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <div class="row"><span class="rl">Note</span><span class="rv" style="font-size:12px">Token decides which user's data to return — no user ID needed in URL</span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">[
+  {
+    "id": 1,
+    "status": "borrowed",
+    "borrowedAt": "2024-06-15T10:00:00Z",
+    "returnedAt": null,
+    "book": {
+      "id": 2,
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "genre": "Technology"
+    }
+  },
+  {
+    "id": 2,
+    "status": "returned",
+    "borrowedAt": "2024-06-10T09:00:00Z",
+    "returnedAt": "2024-06-14T11:00:00Z",
+    "book": {
+      "id": 3,
+      "title": "1984",
+      "author": "George Orwell",
+      "genre": "Fiction"
+    }
+  }
+]</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="POST" data-text="borrow book checkout transaction">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m POST">POST</span>
+    <span class="ep">/api/transactions/borrow/{bookId}</span>
+    <span class="badge b-auth">Token</span>
+    <span class="edesc">Borrow a book</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-auth">Bearer Token — any user</span></span></div>
+    <div class="row"><span class="rl">URL example</span><span class="rv"><div class="code">http://localhost:5000/api/transactions/borrow/2
+                                              ↑ this is the bookId</div></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None — bookId goes in the URL</span></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{ "message": "Clean Code borrowed successfully!" }</div></span></div>
+    <div class="row"><span class="rl">400</span><span class="rv"><div class="code err">{ "message": "No copies available right now." }
+{ "message": "You already have this book borrowed." }</div></span></div>
+    <div class="row"><span class="rl">404</span><span class="rv"><div class="code err">{ "message": "Book not found." }</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="POST" data-text="return book transaction return checkin">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m POST">POST</span>
+    <span class="ep">/api/transactions/return/{transactionId}</span>
+    <span class="badge b-auth">Token</span>
+    <span class="edesc">Return a book</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-auth">Bearer Token — any user</span></span></div>
+    <div class="row"><span class="rl">URL example</span><span class="rv"><div class="code">http://localhost:5000/api/transactions/return/1
+                                               ↑ transaction id from GET /my</div></span></div>
+    <div class="row"><span class="rl">Get the ID</span><span class="rv" style="font-size:12px">Call GET /api/transactions/my → find <code>"id"</code> field in the result → use that number</span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None — transactionId goes in the URL</span></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{ "message": "Clean Code returned successfully!" }</div></span></div>
+    <div class="row"><span class="rl">400</span><span class="rv"><div class="code err">{ "message": "Book already returned." }</div></span></div>
+    <div class="row"><span class="rl">404</span><span class="rv"><div class="code err">{ "message": "Transaction not found." }</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="GET" data-text="all transactions admin every user">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/transactions/all</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">Every transaction</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">[
+  {
+    "id": 1,
+    "status": "borrowed",
+    "borrowedAt": "2024-06-15T10:00:00Z",
+    "returnedAt": null,
+    "user": {
+      "id": 2,
+      "username": "john",
+      "email": "john@test.com"
+    },
+    "book": {
+      "id": 2,
+      "title": "Clean Code",
+      "author": "Robert C. Martin"
+    }
+  }
+]</div></span></div>
+    <div class="row"><span class="rl">403</span><span class="rv"><div class="code err">403 Forbidden — regular user token used</div></span></div>
+  </div>
+</div>
+
+<div class="section-lbl" data-section="admin">Admin — Admin token required for all</div>
+
+<div class="api-card" data-method="GET" data-text="admin stats dashboard numbers total books users borrowed">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/admin/stats</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">Dashboard stats</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{
+  "totalBooks": 4,
+  "totalUsers": 3,
+  "totalBorrowed": 5,
+  "totalReturned": 2,
+  "totalAvailable": 8,
+  "popularBooks": [
+    { "title": "Clean Code", "author": "Robert C. Martin", "count": 3 },
+    { "title": "1984", "author": "George Orwell", "count": 2 },
+    { "title": "Atomic Habits", "author": "James Clear", "count": 1 }
+  ]
+}</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="GET" data-text="admin users all accounts list role email">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/admin/users</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">All user accounts</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <div class="row"><span class="rl">Note</span><span class="rv" style="font-size:12px">Password hash is NOT returned — only safe fields are exposed</span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">[
+  {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@library.com",
+    "role": "admin",
+    "createdAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": 2,
+    "username": "john",
+    "email": "john@test.com",
+    "role": "user",
+    "createdAt": "2024-06-15T10:30:00Z"
+  },
+  {
+    "id": 3,
+    "username": "sara",
+    "email": "sara@test.com",
+    "role": "user",
+    "createdAt": "2024-06-16T08:00:00Z"
+  }
+]</div></span></div>
+  </div>
+</div>
+
+<div class="api-card" data-method="GET" data-text="admin logs activity log actions login borrow return paginated">
+  <div class="api-head" onclick="toggle(this)">
+    <span class="m GET">GET</span>
+    <span class="ep">/api/admin/logs</span>
+    <span class="badge b-admin">Admin only</span>
+    <span class="edesc">Activity logs</span>
+  </div>
+  <div class="api-body">
+    <div class="row"><span class="rl">Auth</span><span class="rv"><span class="badge b-admin">Bearer Token — admin only</span></span></div>
+    <div class="row"><span class="rl">Body</span><span class="rv"><span class="nil">None</span></span></div>
+    <div class="row"><span class="rl">Params tab</span><span class="rv"><div class="code">page  = 1    ← page number   (optional, default 1)
+limit = 20   ← items per page (optional, default 20)</div></span></div>
+    <hr class="divrow">
+    <div class="row"><span class="rl">200 OK</span><span class="rv"><div class="code ok">{
+  "logs": [
+    {
+      "id": 7,
+      "userId": 2,
+      "username": "john",
+      "action": "RETURN",
+      "detail": "Returned book: '1984'",
+      "timestamp": "2024-06-15T14:30:00Z"
+    },
+    {
+      "id": 6,
+      "userId": 2,
+      "username": "john",
+      "action": "BORROW",
+      "detail": "Borrowed book: 'Clean Code'",
+      "timestamp": "2024-06-15T10:05:00Z"
+    },
+    {
+      "id": 5,
+      "userId": 2,
+      "username": "john",
+      "action": "LOGIN",
+      "detail": "User logged in from 127.0.0.1",
+      "timestamp": "2024-06-15T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "username": "admin",
+      "action": "ADD_BOOK",
+      "detail": "Added book: 'Atomic Habits' by James Clear",
+      "timestamp": "2024-06-14T09:00:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "username": "admin",
+      "action": "DELETE_BOOK",
+      "detail": "Deleted book: 'Test Book'",
+      "timestamp": "2024-06-13T11:00:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 3,
+      "username": "sara",
+      "action": "SIGNUP",
+      "detail": "New user registered: sara@test.com",
+      "timestamp": "2024-06-12T08:00:00Z"
+    },
+    {
+      "id": 1,
+      "userId": 1,
+      "username": "admin",
+      "action": "UPDATE_BOOK",
+      "detail": "Updated book: 'Clean Code'",
+      "timestamp": "2024-06-11T10:00:00Z"
+    }
+  ],
+  "total": 7,
+  "page": 1,
+  "limit": 20
+}</div></span></div>
+    <div class="row"><span class="rl">Log actions</span><span class="rv"><div class="code">LOGIN       ← user logged in
+SIGNUP      ← new user registered
+BORROW      ← user borrowed a book
+RETURN      ← user returned a book
+ADD_BOOK    ← admin added a book
+UPDATE_BOOK ← admin updated a book
+DELETE_BOOK ← admin deleted a book</div></span></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function toggle(h){
+  const b=h.nextElementSibling;
+  const wasOpen=b.classList.contains('open');
+  document.querySelectorAll('.api-body.open').forEach(x=>x.classList.remove('open'));
+  if(!wasOpen) b.classList.add('open');
+}
+function filterMethod(m,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  let vis=0;
+  document.querySelectorAll('.api-card').forEach(c=>{
+    const hide = m!=='ALL' && c.dataset.method!==m;
+    c.classList.toggle('hidden',hide);
+    if(!hide) vis++;
+  });
+  updateSectionVisibility();
+  document.getElementById('count-lbl').textContent=vis+' endpoint'+(vis===1?'':'s');
+}
+function searchApis(v){
+  const q=v.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('.api-card').forEach(c=>{
+    const txt=(c.dataset.text+' '+c.querySelector('.ep').textContent).toLowerCase();
+    const hide=q.length>0 && !txt.includes(q);
+    c.classList.toggle('hidden',hide);
+    if(!hide) vis++;
+  });
+  updateSectionVisibility();
+  document.getElementById('count-lbl').textContent=vis+' endpoint'+(vis===1?'':'s');
+}
+function updateSectionVisibility(){
+  document.querySelectorAll('.section-lbl').forEach(lbl=>{
+    const section=lbl.dataset.section;
+    const cards=document.querySelectorAll(`.api-card[data-text*="${section}"], .api-card`);
+    let next=lbl.nextElementSibling;
+    let anyVisible=false;
+    while(next && !next.classList.contains('section-lbl')){
+      if(!next.classList.contains('hidden') && next.classList.contains('api-card')) anyVisible=true;
+      next=next.nextElementSibling;
+    }
+    lbl.classList.toggle('hidden',!anyVisible);
+  });
+}
+</script>
