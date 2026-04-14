@@ -16,11 +16,16 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Restore
-      run: dotnet restore
+    - name: Find & Restore
+      run: |
+        FILE=$(find . -name "*.csproj" | head -n 1)
+        echo "Found project: $FILE"
+        dotnet restore "$FILE"
 
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Find & Build
+      run: |
+        FILE=$(find . -name "*.csproj" | head -n 1)
+        dotnet build "$FILE" --no-restore
 
   frontend:
     runs-on: ubuntu-latest
