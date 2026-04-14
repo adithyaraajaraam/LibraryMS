@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore backend/LibraryMS.csproj
+
+    - name: Build
+      run: dotnet build backend/LibraryMS.csproj --no-restore
+
+    # optional (only if you have tests)
+    # - name: Test
+    #   run: dotnet test backend/LibraryMS.csproj --no-build
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install + Build
+      run: |
+        cd frontend
+        npm install
+        npm run build
